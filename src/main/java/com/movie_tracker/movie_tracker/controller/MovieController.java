@@ -2,6 +2,8 @@ package com.movie_tracker.movie_tracker.controller;
 
 import com.movie_tracker.movie_tracker.models.Movie;
 import com.movie_tracker.movie_tracker.service.MovieService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -19,9 +21,8 @@ public class MovieController {
     }
 
     @GetMapping
-    public List<Movie> getAllMovies(){
-        List<Movie> movies = movieService.getAllMovies();
-        return movies;
+    public Page<Movie> getAllMovie(Pageable pageable){
+        return movieService.getAllMovies(pageable);
     }
     @PostMapping
     public ResponseEntity<Movie> addMovie(@RequestBody Movie movie){
