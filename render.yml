@@ -1,0 +1,29 @@
+# render.yaml
+services:
+  - type: web
+    name: movie-tracker
+    env: standard
+    branch: main
+    buildCommand: ./mvnw clean package
+    startCommand: java -jar target/movie-tracker-0.0.1-SNAPSHOT.jar
+    plan: free
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+      - key: DB_URL
+        fromDatabase:
+          name: movie-tracker-db
+          property: connectionString
+      - key: DB_USERNAME
+        fromDatabase:
+          name: movie-tracker-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: movie-tracker-db
+          property: password
+
+databases:
+  - name: movie-tracker-db
+    engine: postgresql
+    plan: free
