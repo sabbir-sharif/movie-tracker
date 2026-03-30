@@ -1,0 +1,204 @@
+/* --- Global Styles --- */
+body {
+    /* Font that looks vintage and magical */
+    font-family: 'Almendra', serif;
+    /* Dark background, like Hogwarts at night or a dungeon */
+    background-color: #1a1510;
+    /* Basic font color is parchment-like */
+    color: #f1e0c6;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    line-height: 1.6;
+}
+
+.container {
+    width: 90%;
+    max-width: 900px;
+    margin-top: 50px;
+}
+
+/* Main Title - Gryffindor Red with a subtle magical glow */
+h1 {
+    text-align: center;
+    color: #740001; /* Deep Red */
+    font-size: 3em;
+    text-shadow: 0 0 10px #ae0001, 2px 2px 2px #d3a625; /* Red glow and small gold shadow */
+    margin-bottom: 40px;
+}
+
+/* --- Cards (Form & Table Container) --- */
+.card {
+    /* Use a light color to simulate parchment */
+    background-color: #f1e0c6;
+    /* Optional: If you want a textured parchment look, add a seamless image
+       parchment.jpg into your css/ folder and uncomment the next line: */
+    /* background-image: url('parchment.jpg'); */
+
+    color: #3e2723; /* Dark brown text for parchment */
+    padding: 30px;
+    border-radius: 20px 5px 20px 5px; /* Irregular rustic corners */
+    margin-bottom: 25px;
+
+    /* Look of a heavy parchment scroll on a table */
+    box-shadow: 0 10px 20px rgba(0,0,0,0.5), inset 0 0 50px rgba(116, 0, 1, 0.1);
+    border: 3px solid #ae0001; /* Crimson border */
+}
+
+/* Specific styling for form and table cards */
+.form-section { border-bottom-left-radius: 5px; }
+.table-section { border-top-right-radius: 5px; }
+
+
+/* --- Form Elements --- */
+form { display: flex; gap: 15px; flex-wrap: wrap; }
+
+input, select, button {
+    padding: 12px;
+    border-radius: 5px;
+    border: 2px solid #3e2723; /* Dark brown border */
+    font-family: 'Almendra', serif;
+    font-size: 1em;
+}
+
+input, select {
+    background-color: #fffaf0; /* Slightly lighter parchment */
+    color: #3e2723;
+    flex: 1;
+    min-width: 180px;
+    box-shadow: inset 1px 1px 3px rgba(0,0,0,0.1);
+}
+
+input:focus, select:focus {
+    outline: none;
+    border-color: #d3a625; /* Gold glow on focus */
+    box-shadow: 0 0 10px rgba(211, 166, 37, 0.5);
+}
+
+/* Placeholder text color */
+input::placeholder { color: #8d6e63; opacity: 0.7; }
+
+/* The Main "Cast Entry" Button - Gryffindor/Golden Snitch Style */
+button {
+    background: linear-gradient(135deg, #ae0001 0%, #740001 100%); /* Crimson Gradient */
+    color: #d3a625; /* Gold Text */
+    border: 2px solid #d3a625;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-shadow: 1px 1px 1px #000;
+}
+
+button:hover {
+    background: linear-gradient(135deg, #740001 0%, #ae0001 100%); /* Reverse Gradient */
+    box-shadow: 0 0 15px #d3a625; /* Golden glow on hover */
+    transform: translateY(-2px); /* Slight hover lift */
+}
+
+
+/* --- Table Styles --- */
+table {
+    width: 100%;
+    border-collapse: separate; /* Allow spacing for rustic feel */
+    border-spacing: 0 5px; /* Rustic spacing between rows */
+}
+
+th {
+    color: #740001;
+    font-weight: bold;
+    font-size: 1.1em;
+    text-align: left;
+    padding: 15px 12px;
+    border-bottom: 3px solid #d3a625; /* Thick gold line */
+}
+
+td {
+    padding: 15px 12px;
+    background-color: #fffaf0; /* Clean white-parchment background for readability */
+    color: #3e2723;
+    border-bottom: 1px solid #d3a625;
+}
+
+/* Specific styling for the rustic row feel */
+tr:nth-child(even) td { background-color: #f7f1e6; } /* Alternating row color */
+tr:last-child td:first-child { border-bottom-left-radius: 10px; }
+tr:last-child td:last-child { border-bottom-right-radius: 10px; }
+
+/* The Status Tag - Gold snitch pill */
+.status-tag {
+    display: inline-block;
+    padding: 5px 10px;
+    background-color: #d3a625; /* Gold background */
+    color: #740001; /* Deep red text */
+    font-weight: bold;
+    border-radius: 20px;
+    font-size: 0.8em;
+    border: 1px solid #740001;
+}
+
+/* Action Buttons (Edit/Delete) */
+.btn-edit {
+    background: linear-gradient(135deg, #4caf50, #2e7d32); /* Wizarding Green */
+    color: white;
+    margin-right: 5px;
+    border: none;
+}
+.btn-edit:hover { box-shadow: 0 0 10px #4caf50; border: none; }
+
+.btn-delete {
+    background: linear-gradient(135deg, #f44336, #c62828); /* Red/Flame */
+    color: white;
+    border: none;
+}
+.btn-delete:hover { box-shadow: 0 0 10px #f44336; border: none; }
+
+
+/* --- Pagination Styles --- */
+.pagination-controls, .pagination-buttons {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 25px;
+    color: #740001;
+    font-weight: bold;
+}
+
+.pagination-controls select {
+    padding: 5px 10px;
+    margin-left: 10px;
+    background-color: #fffaf0;
+    color: #740001;
+}
+
+.pagination-buttons {
+    justify-content: center;
+    gap: 20px;
+}
+
+/* Pagination Buttons - "Gilded" style */
+.pagination-buttons button {
+    background: none;
+    background-color: #f1e0c6; /* Match parchment */
+    color: #d3a625; /* Gold text */
+    border: 2px solid #d3a625;
+}
+.pagination-buttons button:hover {
+    background-color: #d3a625; /* Flip colors on hover */
+    color: #740001;
+    box-shadow: 0 0 10px #d3a625;
+}
+
+.pagination-buttons button:disabled {
+    background-color: #fffaf0;
+    color: #8d6e63;
+    border-color: #8d6e63;
+    cursor: not-allowed;
+    opacity: 0.5;
+    box-shadow: none;
+}
+
+#pageInfo {
+    font-size: 1.1em;
+    color: #d3a625;
+    text-shadow: 1px 1px 1px rgba(0,0,0,0.5);
+}
