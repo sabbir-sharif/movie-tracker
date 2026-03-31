@@ -171,5 +171,10 @@ function resetForm() {
     submitBtn.innerText = "Cast Entry";
 }
 
+function handleLogout() {
+  // your logout logic here (clear session, redirect, etc.)
+  window.location.href = "/login";
+}
+
 // Start the magic when the page loads
 document.addEventListener('DOMContentLoaded', fetchMovies);

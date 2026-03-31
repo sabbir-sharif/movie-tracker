@@ -1,20 +1,46 @@
 package com.movie_tracker.movie_tracker.models;
 
-import jakarta.persistence.Entity;
+import jakarta.persistence.*;
+
+import java.util.List;
 
 @Entity
 public class User {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     private String name;
     private String email;
+    private String password;
+
+    @OneToMany(mappedBy = "user")
+    private List<Movie> movies;
 
     public User() {
     }
 
-    public User(int id, String name, String email) {
-        this.id = id;
+
+    public User(String name, String email, String password) {
         this.name = name;
         this.email = email;
+        this.password = password;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public List<Movie> getMovies() {
+        return movies;
+    }
+
+    public void setMovies(List<Movie> movies) {
+        this.movies = movies;
     }
 
     public int getId() {

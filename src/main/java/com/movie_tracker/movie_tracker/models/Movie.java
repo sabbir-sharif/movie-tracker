@@ -1,9 +1,6 @@
 package com.movie_tracker.movie_tracker.models;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
 @Entity
 public class Movie {
@@ -12,16 +9,28 @@ public class Movie {
     private int id;
     private String title;
     private String genre;
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
 
     private String status = "TO_WATCH";
 
     public Movie() {
     }
 
-    public Movie(String status, String genre, String title) {
+    public Movie(String status, String genre, String title, User user) {
         this.status = status != null ? status : "TO_WATCH";
         this.genre = genre;
         this.title = title;
+        this.user = user;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 
     public int getId() {

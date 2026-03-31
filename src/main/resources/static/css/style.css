@@ -1,204 +1,114 @@
-/* --- Global Styles --- */
+*,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
+
 body {
-    /* Font that looks vintage and magical */
-    font-family: 'Almendra', serif;
-    /* Dark background, like Hogwarts at night or a dungeon */
-    background-color: #1a1510;
-    /* Basic font color is parchment-like */
-    color: #f1e0c6;
-    margin: 0;
-    display: flex;
-    justify-content: center;
-    line-height: 1.6;
+  font-family: 'Inter', sans-serif;
+  background: #0f1117;
+  color: #e2e8f0;
+  min-height: 100vh;
+  font-size: 15px;
 }
 
-.container {
-    width: 90%;
-    max-width: 900px;
-    margin-top: 50px;
+/* NAVBAR */
+.navbar {
+  display: flex; align-items: center; justify-content: flex-end;
+  gap: 16px; padding: 0 32px; height: 52px;
+  background: #0f1117; border-bottom: 1px solid #1e2433;
+  position: sticky; top: 0; z-index: 100;
 }
+.user-info { display: flex; align-items: center; gap: 8px; color: #94a3b8; font-size: 0.85rem; }
+.avatar {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: #1e3a5f; color: #60a5fa;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.72rem; font-weight: 600;
+}
+.nav-divider { width: 1px; height: 18px; background: #1e2433; }
+.logout-btn {
+  background: none; border: 1px solid #1e2433; border-radius: 6px;
+  color: #64748b; font-family: 'Inter', sans-serif; font-size: 0.8rem;
+  padding: 5px 12px; cursor: pointer; transition: all 0.15s;
+}
+.logout-btn:hover { border-color: #334155; color: #94a3b8; }
 
-/* Main Title - Gryffindor Red with a subtle magical glow */
+/* LAYOUT */
+.container { width: 90%; max-width: 880px; margin: 0 auto; padding: 40px 0 60px; }
+
 h1 {
-    text-align: center;
-    color: #740001; /* Deep Red */
-    font-size: 3em;
-    text-shadow: 0 0 10px #ae0001, 2px 2px 2px #d3a625; /* Red glow and small gold shadow */
-    margin-bottom: 40px;
+  font-size: 1.5rem; font-weight: 600; color: #f1f5f9;
+  text-align: center; margin-bottom: 32px; letter-spacing: -0.01em;
 }
 
-/* --- Cards (Form & Table Container) --- */
+/* CARD */
 .card {
-    /* Use a light color to simulate parchment */
-    background-color: #f1e0c6;
-    /* Optional: If you want a textured parchment look, add a seamless image
-       parchment.jpg into your css/ folder and uncomment the next line: */
-    /* background-image: url('parchment.jpg'); */
-
-    color: #3e2723; /* Dark brown text for parchment */
-    padding: 30px;
-    border-radius: 20px 5px 20px 5px; /* Irregular rustic corners */
-    margin-bottom: 25px;
-
-    /* Look of a heavy parchment scroll on a table */
-    box-shadow: 0 10px 20px rgba(0,0,0,0.5), inset 0 0 50px rgba(116, 0, 1, 0.1);
-    border: 3px solid #ae0001; /* Crimson border */
+  background: #161b27; border: 1px solid #1e2433;
+  border-radius: 10px; padding: 22px 24px; margin-bottom: 18px;
 }
 
-/* Specific styling for form and table cards */
-.form-section { border-bottom-left-radius: 5px; }
-.table-section { border-top-right-radius: 5px; }
-
-
-/* --- Form Elements --- */
-form { display: flex; gap: 15px; flex-wrap: wrap; }
-
-input, select, button {
-    padding: 12px;
-    border-radius: 5px;
-    border: 2px solid #3e2723; /* Dark brown border */
-    font-family: 'Almendra', serif;
-    font-size: 1em;
-}
+/* FORM */
+form { display: flex; gap: 10px; flex-wrap: wrap; }
 
 input, select {
-    background-color: #fffaf0; /* Slightly lighter parchment */
-    color: #3e2723;
-    flex: 1;
-    min-width: 180px;
-    box-shadow: inset 1px 1px 3px rgba(0,0,0,0.1);
+  flex: 1; min-width: 160px; padding: 9px 13px;
+  background: #0f1117; border: 1px solid #1e2433; border-radius: 7px;
+  color: #e2e8f0; font-family: 'Inter', sans-serif; font-size: 0.9rem;
+  outline: none; transition: border-color 0.15s;
 }
+input::placeholder { color: #334155; }
+input:focus, select:focus { border-color: #3b82f6; }
+select option { background: #0f1117; }
 
-input:focus, select:focus {
-    outline: none;
-    border-color: #d3a625; /* Gold glow on focus */
-    box-shadow: 0 0 10px rgba(211, 166, 37, 0.5);
+#submitBtn {
+  padding: 9px 20px; background: #3b82f6; border: none; border-radius: 7px;
+  color: #fff; font-family: 'Inter', sans-serif; font-size: 0.88rem;
+  font-weight: 500; cursor: pointer; transition: background 0.15s; white-space: nowrap;
 }
+#submitBtn:hover { background: #2563eb; }
 
-/* Placeholder text color */
-input::placeholder { color: #8d6e63; opacity: 0.7; }
-
-/* The Main "Cast Entry" Button - Gryffindor/Golden Snitch Style */
-button {
-    background: linear-gradient(135deg, #ae0001 0%, #740001 100%); /* Crimson Gradient */
-    color: #d3a625; /* Gold Text */
-    border: 2px solid #d3a625;
-    font-weight: bold;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    text-shadow: 1px 1px 1px #000;
+/* TABLE HEADER */
+.section-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 16px; flex-wrap: wrap; gap: 10px;
 }
+.section-title { font-size: 0.78rem; color: #475569; letter-spacing: 0.06em; text-transform: uppercase; font-weight: 500; }
+.pagination-controls { display: flex; align-items: center; gap: 8px; color: #475569; font-size: 0.8rem; }
+.pagination-controls select { min-width: unset; flex: unset; width: 64px; padding: 4px 8px; }
 
-button:hover {
-    background: linear-gradient(135deg, #740001 0%, #ae0001 100%); /* Reverse Gradient */
-    box-shadow: 0 0 15px #d3a625; /* Golden glow on hover */
-    transform: translateY(-2px); /* Slight hover lift */
-}
-
-
-/* --- Table Styles --- */
-table {
-    width: 100%;
-    border-collapse: separate; /* Allow spacing for rustic feel */
-    border-spacing: 0 5px; /* Rustic spacing between rows */
-}
-
+/* TABLE */
+table { width: 100%; border-collapse: collapse; }
 th {
-    color: #740001;
-    font-weight: bold;
-    font-size: 1.1em;
-    text-align: left;
-    padding: 15px 12px;
-    border-bottom: 3px solid #d3a625; /* Thick gold line */
+  font-size: 0.72rem; letter-spacing: 0.07em; text-transform: uppercase;
+  color: #475569; font-weight: 500; text-align: left; padding: 10px 12px;
+  border-bottom: 1px solid #1e2433;
 }
+td { padding: 12px 12px; color: #cbd5e1; font-size: 0.9rem; border-bottom: 1px solid #161b27; }
+tbody tr:hover td { background: #1a2030; }
 
-td {
-    padding: 15px 12px;
-    background-color: #fffaf0; /* Clean white-parchment background for readability */
-    color: #3e2723;
-    border-bottom: 1px solid #d3a625;
-}
-
-/* Specific styling for the rustic row feel */
-tr:nth-child(even) td { background-color: #f7f1e6; } /* Alternating row color */
-tr:last-child td:first-child { border-bottom-left-radius: 10px; }
-tr:last-child td:last-child { border-bottom-right-radius: 10px; }
-
-/* The Status Tag - Gold snitch pill */
+/* STATUS */
 .status-tag {
-    display: inline-block;
-    padding: 5px 10px;
-    background-color: #d3a625; /* Gold background */
-    color: #740001; /* Deep red text */
-    font-weight: bold;
-    border-radius: 20px;
-    font-size: 0.8em;
-    border: 1px solid #740001;
+  display: inline-block; padding: 2px 9px; border-radius: 5px;
+  font-size: 0.72rem; font-weight: 500;
 }
+.status-tag.watched  { background: #14532d; color: #4ade80; }
+.status-tag.watching { background: #422006; color: #fb923c; }
+.status-tag.to-watch { background: #1e293b; color: #64748b; }
 
-/* Action Buttons (Edit/Delete) */
-.btn-edit {
-    background: linear-gradient(135deg, #4caf50, #2e7d32); /* Wizarding Green */
-    color: white;
-    margin-right: 5px;
-    border: none;
+/* ACTION BUTTONS */
+.btn-edit, .btn-delete {
+  padding: 4px 11px; border-radius: 5px; font-family: 'Inter', sans-serif;
+  font-size: 0.75rem; cursor: pointer; transition: all 0.15s; font-weight: 500;
 }
-.btn-edit:hover { box-shadow: 0 0 10px #4caf50; border: none; }
+.btn-edit   { background: #1e3a2f; color: #4ade80; border: 1px solid #166534; margin-right: 5px; }
+.btn-edit:hover { background: #166534; }
+.btn-delete { background: #2d1a1a; color: #f87171; border: 1px solid #7f1d1d; }
+.btn-delete:hover { background: #7f1d1d; }
 
-.btn-delete {
-    background: linear-gradient(135deg, #f44336, #c62828); /* Red/Flame */
-    color: white;
-    border: none;
-}
-.btn-delete:hover { box-shadow: 0 0 10px #f44336; border: none; }
-
-
-/* --- Pagination Styles --- */
-.pagination-controls, .pagination-buttons {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 25px;
-    color: #740001;
-    font-weight: bold;
-}
-
-.pagination-controls select {
-    padding: 5px 10px;
-    margin-left: 10px;
-    background-color: #fffaf0;
-    color: #740001;
-}
-
-.pagination-buttons {
-    justify-content: center;
-    gap: 20px;
-}
-
-/* Pagination Buttons - "Gilded" style */
+/* PAGINATION */
+.pagination-buttons { display: flex; align-items: center; justify-content: center; gap: 12px; margin-top: 20px; }
 .pagination-buttons button {
-    background: none;
-    background-color: #f1e0c6; /* Match parchment */
-    color: #d3a625; /* Gold text */
-    border: 2px solid #d3a625;
+  background: #161b27; border: 1px solid #1e2433; border-radius: 6px;
+  color: #64748b; font-family: 'Inter', sans-serif; font-size: 0.8rem;
+  padding: 6px 16px; cursor: pointer; transition: all 0.15s;
 }
-.pagination-buttons button:hover {
-    background-color: #d3a625; /* Flip colors on hover */
-    color: #740001;
-    box-shadow: 0 0 10px #d3a625;
-}
-
-.pagination-buttons button:disabled {
-    background-color: #fffaf0;
-    color: #8d6e63;
-    border-color: #8d6e63;
-    cursor: not-allowed;
-    opacity: 0.5;
-    box-shadow: none;
-}
-
-#pageInfo {
-    font-size: 1.1em;
-    color: #d3a625;
-    text-shadow: 1px 1px 1px rgba(0,0,0,0.5);
-}
+.pagination-buttons button:hover:not(:disabled) { border-color: #334155; color: #94a3b8; }
+.pagination-buttons button:disabled { opacity: 0.35; cursor: not-allowed; }
+#pageInfo { font-size: 0.8rem; color: #475569; }
