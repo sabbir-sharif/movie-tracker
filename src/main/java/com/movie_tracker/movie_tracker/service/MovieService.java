@@ -1,12 +1,11 @@
 package com.movie_tracker.movie_tracker.service;
 
 import com.movie_tracker.movie_tracker.models.Movie;
+import com.movie_tracker.movie_tracker.models.User;
 import com.movie_tracker.movie_tracker.repository.MovieRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 public class MovieService {
@@ -20,8 +19,8 @@ public class MovieService {
     public Movie addMovie(Movie movie){
         return movieRepository.save(movie);
     }
-    public Page<Movie> getAllMovies(Pageable pageable){
-        return movieRepository.findAll(pageable);
+    public Page<Movie> getAllMovies(User user, Pageable pageable){
+        return movieRepository.findByUser(user, pageable);
     }
     public Movie getById(int id){
         return movieRepository.getById(id);

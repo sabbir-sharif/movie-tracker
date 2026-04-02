@@ -1,73 +1,42 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hogwarts Movie Chronicle</title>
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Almendra:wght@400;700&display=swap" rel="stylesheet">
+  <meta charset="UTF-8">
+  <title>Wizard Auth Portal</title>
+  <link href="https://fonts.googleapis.com/css2?family=Almendra&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/auth.css">
 </head>
 <body>
 
-<!-- ✦ NAVBAR ✦ -->
-<nav class="navbar">
-    <div class="user-info">
-        <div class="avatar" id="userAvatar">HP</div>
-        <span id="usernameDisplay">Harry Potter</span>
-    </div>
-    <div class="nav-divider"></div>
-    <button class="logout-btn" onclick="handleLogout()">⚡ Logout</button>
-</nav>
+<div class="auth-container">
 
-<div class="container">
-    <h1>⚡ Hogwarts Movie Chronicle ⚡</h1>
+  <!-- 🧙 LOGIN SIDE -->
+  <div class="auth-panel login-panel">
+    <h2>🔮 Login</h2>
 
-    <div class="card form-section">
-        <form id="movieForm">
-            <input type="hidden" id="movieId">
-            <input type="text" id="title" placeholder="Title" required>
-            <input type="text" id="genre" placeholder="Genre" required>
-            <select id="status">
-                <option value="TO_WATCH">Pending (To Watch)</option>
-                <option value="WATCHING">Currently Reviewing</option>
-                <option value="WATCHED">Completed</option>
-            </select>
-            <button type="submit" id="submitBtn">Cast Entry</button>
-        </form>
-    </div>
+    <form id="loginForm">
+      <input type="email" placeholder="Owl Mail (Email)" id="loginEmail" required>
+      <input type="password" placeholder="Secret Spell (Password)" id="loginPassword" required>
 
-    <div class="card table-section">
-        <div class="pagination-controls">
-            <label for="pageSize">Display entries per quill stroke:</label>
-            <select id="pageSize" onchange="changeSize()">
-                <option value="5">5</option>
-                <option value="10" selected>10</option>
-                <option value="20">20</option>
-            </select>
-        </div>
-        <table>
-            <thead>
-            <tr>
-                <th>Entry Title</th>
-                <th>Subject</th>
-                <th>Status</th>
-                <th>Actions</th>
-            </tr>
-            </thead>
-            <tbody id="movieTableBody">
-            </tbody>
-        </table>
+      <button type="submit">Enter Hogwarts</button>
+    </form>
+  </div>
 
-        <div class="pagination-buttons">
-            <button id="prevBtn" onclick="changePage(-1)">Previous Page</button>
-            <span id="pageInfo">Page 1</span>
-            <button id="nextBtn" onclick="changePage(1)">Next Page</button>
-        </div>
-    </div>
+  <!-- 🪄 SIGNUP SIDE -->
+  <div class="auth-panel signup-panel">
+    <h2>🪶 Signup</h2>
+
+    <form id="signupForm">
+      <input type="text" placeholder="Wizard Name" id="signupName" required>
+      <input type="email" placeholder="Owl Mail (Email)" id="signupEmail" required>
+      <input type="password" placeholder="Create Spell (Password)" id="signupPassword" required>
+
+      <button type="submit">Join the Order</button>
+    </form>
+  </div>
+
 </div>
-<script src="js/script.js"></script>
+
+<script src="js/auth.js"></script>
 </body>
 </html>

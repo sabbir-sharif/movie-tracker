@@ -1,0 +1,74 @@
+body {
+    font-family: 'Almendra', serif;
+    background: linear-gradient(to right, #1a1510, #2c1e1e);
+    color: #f1e0c6;
+    margin: 0;
+    height: 100vh;
+}
+
+/* Container */
+.auth-container {
+    display: flex;
+    height: 100vh;
+}
+
+/* Panels */
+.auth-panel {
+    flex: 1;
+    padding: 60px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+/* LOGIN SIDE */
+.login-panel {
+    background: #1a1510;
+    border-right: 2px solid #d3a625;
+}
+
+/* SIGNUP SIDE */
+.signup-panel {
+    background: #2a1a1a;
+}
+
+/* Titles */
+h2 {
+    color: #d3a625;
+    margin-bottom: 30px;
+    font-size: 2em;
+    text-shadow: 0 0 10px #740001;
+}
+
+/* Inputs */
+input {
+    display: block;
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+
+    background: #fffaf0;
+    border: 2px solid #3e2723;
+    border-radius: 5px;
+
+    font-family: 'Almendra', serif;
+}
+
+/* Buttons */
+button {
+    padding: 12px;
+    border: none;
+    border-radius: 5px;
+
+    background: linear-gradient(135deg, #ae0001, #740001);
+    color: #d3a625;
+
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+button:hover {
+    box-shadow: 0 0 15px #d3a625;
+    transform: translateY(-2px);
+}

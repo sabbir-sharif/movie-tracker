@@ -3,7 +3,7 @@
  */
 const API_URL = "http://localhost:8080/movies";
 let currentPage = 0;
-let currentSize = 10;
+let currentSize = 5;
 let currentMovies = []; // MAGIC FIX: Stores the current page of movies to avoid string errors
 
 // DOM Elements

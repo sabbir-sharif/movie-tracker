@@ -6,13 +6,11 @@ import com.movie_tracker.movie_tracker.repository.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import static org.springframework.util.ClassUtils.isPresent;
 
+@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
@@ -49,5 +47,17 @@ public class AuthController {
         session.setAttribute("userId", user.getId());
 
         return ResponseEntity.ok("Login successfully.");
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(HttpServletRequest request){
+
+        HttpSession session = request.getSession(false);
+
+        if(session != null){
+            session.invalidate();
+        }
+
+        return ResponseEntity.ok("Logged out successfully.");
     }
 }
