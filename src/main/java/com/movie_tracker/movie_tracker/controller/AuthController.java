@@ -1,63 +1,59 @@
 package com.movie_tracker.movie_tracker.controller;
 
-import com.movie_tracker.movie_tracker.models.LoginUser;
 import com.movie_tracker.movie_tracker.models.User;
 import com.movie_tracker.movie_tracker.repository.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import static org.springframework.util.ClassUtils.isPresent;
+import java.util.Optional;
 
-@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
 
+    @Autowired
     private UserRepository userRepository;
 
-    @PostMapping("/register")
-    public ResponseEntity<?> userRegister(@RequestBody User request){
 
-        if(userRepository.findByEmail(request.getEmail()).isPresent()){
+    @PostMapping("/signup")
+    public ResponseEntity<?> signup(@RequestBody User user) {
+
+        Optional<User> existingUser = userRepository.findByEmail(user.getEmail());
+
+        if (existingUser.isPresent()) {
             return ResponseEntity.badRequest().body("Email already exists");
         }
 
-        User user = new User();
-        user.setEmail(request.getEmail());
-        user.setName(request.getName());
-        user.setPassword(request.getPassword());
+        userRepository.save(user);
 
-        return ResponseEntity.ok("User successfully registered.");
+        return ResponseEntity.ok("User registered successfully");
     }
+
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginUser request,
-                                   HttpServletRequest httpRequest){
+    public ResponseEntity<?> login(@RequestBody User requestUser,
+                                   HttpServletRequest request) {
 
-        User user = userRepository.findByEmail(request.getEmail()).orElse(null);
+        Optional<User> userOptional =
+                userRepository.findByEmail(requestUser.getEmail());
 
-        if(user == null || !user.getPassword().equals(request.getPassword())){
-            return ResponseEntity.status(401).body("Invalid Credentials");
+        if (userOptional.isEmpty()) {
+            return ResponseEntity.status(401).body("Invalid email");
         }
 
-        HttpSession session = httpRequest.getSession(true);
+        User user = userOptional.get();
 
+        if (!user.getPassword().equals(requestUser.getPassword())) {
+            return ResponseEntity.status(401).body("Invalid password");
+        }
+
+
+        HttpSession session = request.getSession(true);
         session.setAttribute("userId", user.getId());
 
-        return ResponseEntity.ok("Login successfully.");
-    }
-
-    @PostMapping("/logout")
-    public ResponseEntity<?> logout(HttpServletRequest request){
-
-        HttpSession session = request.getSession(false);
-
-        if(session != null){
-            session.invalidate();
-        }
-
-        return ResponseEntity.ok("Logged out successfully.");
+        return ResponseEntity.ok("Login successful");
     }
 }

@@ -21,22 +21,27 @@ public class SessionAuthFilter extends OncePerRequestFilter {
 
         String path = request.getRequestURI();
 
-        // ✅ Public routes
-        if (path.startsWith("/auth")) {
+        // ✅ ALLOW PUBLIC ROUTES
+        if (path.equals("/") ||   // ✅ ADD THIS
+                path.startsWith("/auth") ||
+                path.startsWith("/auth/signup") ||
+                path.startsWith("/login") ||
+                path.startsWith("/css") ||
+                path.startsWith("/js") ||
+                path.startsWith("/index.html") ||
+                path.startsWith("/app.html")) {
+
             filterChain.doFilter(request, response);
             return;
         }
 
         HttpSession session = request.getSession(false);
 
-        // ❌ Not logged in
         if (session == null || session.getAttribute("userId") == null) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.getWriter().write("Unauthorized");
             return;
         }
 
-        // ✅ Continue request
         filterChain.doFilter(request, response);
     }
 }
