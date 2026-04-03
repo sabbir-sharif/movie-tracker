@@ -5,6 +5,7 @@ import com.movie_tracker.movie_tracker.models.User;
 import com.movie_tracker.movie_tracker.repository.UserRepository;
 import com.movie_tracker.movie_tracker.service.MovieService;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -36,14 +37,35 @@ public class MovieController {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        return movieService.getAllMovies(user , pageable);
+        return movieService.getAllMovies(user, pageable);
     }
 
 
     @PostMapping
-    public ResponseEntity<Movie> addMovie(@RequestBody Movie movie){
-        Movie newMovie = movieService.addMovie(movie);
-        return ResponseEntity.ok(newMovie);
+    public ResponseEntity<?> addMovie(@RequestBody Movie movie,
+                                      HttpServletRequest request) {
+
+        HttpSession session = request.getSession(false);
+
+        // ✅ SAFETY CHECK
+        if (session == null || session.getAttribute("userId") == null) {
+            return ResponseEntity.status(401).body("Unauthorized");
+        }
+
+        int userId = (int) session.getAttribute("userId");
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        Movie newMovie = new Movie();
+        newMovie.setGenre(movie.getGenre());
+        newMovie.setTitle(movie.getTitle());
+        newMovie.setStatus(movie.getStatus());
+        newMovie.setUser(user);
+
+        Movie savedMovie = movieService.addMovie(newMovie);
+
+        return ResponseEntity.ok(savedMovie);
     }
 
     @PutMapping("/{id}")

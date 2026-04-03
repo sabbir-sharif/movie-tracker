@@ -44,6 +44,7 @@ document.getElementById("signupForm").addEventListener("submit", async (e) => {
         headers: {
             "Content-Type": "application/json"
         },
+        credentials: "include",
         body: JSON.stringify(data)
     });
 
