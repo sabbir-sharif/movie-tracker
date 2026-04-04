@@ -1,5 +1,6 @@
 package com.movie_tracker.movie_tracker.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.util.List;
@@ -10,16 +11,20 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
+
     private String name;
+
+    @Column(unique = true)
     private String email;
+
+   // @JsonIgnore // VERY IMPORTANT (security)
     private String password;
 
     @OneToMany(mappedBy = "user")
+    @JsonIgnore // prevents infinite loop
     private List<Movie> movies;
 
-    public User() {
-    }
-
+    public User() {}
 
     public User(String name, String email, String password) {
         this.name = name;

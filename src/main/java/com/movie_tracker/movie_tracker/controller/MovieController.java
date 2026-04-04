@@ -10,79 +10,121 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/movies")
+@CrossOrigin(origins = "http://127.0.0.1:5500", allowCredentials = "true")
 public class MovieController {
 
-    MovieService movieService;
+    private final MovieService movieService;
+
     @Autowired
-    UserRepository userRepository;
+    private UserRepository userRepository;
 
     public MovieController(MovieService movieService) {
         this.movieService = movieService;
     }
 
-    @GetMapping
-    public Page<Movie> getAllMovie(HttpServletRequest request,
-                                   Pageable pageable){
-
-        int userId = (int) request.getSession(false).getAttribute("userId");
-
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
-        return movieService.getAllMovies(user, pageable);
-    }
-
-
-    @PostMapping
-    public ResponseEntity<?> addMovie(@RequestBody Movie movie,
-                                      HttpServletRequest request) {
-
+    // ✅ Helper method (VERY IMPORTANT)
+    private User getLoggedInUser(HttpServletRequest request) {
         HttpSession session = request.getSession(false);
 
-        // ✅ SAFETY CHECK
         if (session == null || session.getAttribute("userId") == null) {
-            return ResponseEntity.status(401).body("Unauthorized");
+            throw new RuntimeException("Unauthorized");
         }
 
         int userId = (int) session.getAttribute("userId");
 
-        User user = userRepository.findById(userId)
+        return userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
-
-        Movie newMovie = new Movie();
-        newMovie.setGenre(movie.getGenre());
-        newMovie.setTitle(movie.getTitle());
-        newMovie.setStatus(movie.getStatus());
-        newMovie.setUser(user);
-
-        Movie savedMovie = movieService.addMovie(newMovie);
-
-        return ResponseEntity.ok(savedMovie);
     }
 
+    // ✅ GET all movies (SAFE)
+    @GetMapping
+    public ResponseEntity<?> getAllMovie(HttpServletRequest request,
+                                         Pageable pageable) {
+        try {
+            User user = getLoggedInUser(request);
+            Page<Movie> movies = movieService.getAllMovies(user, pageable);
+            return ResponseEntity.ok(movies);
+        } catch (Exception e) {
+            return ResponseEntity.status(401).body("Unauthorized");
+        }
+    }
+
+    // ✅ ADD movie
+    @PostMapping
+    public ResponseEntity<?> addMovie(@RequestBody Movie movie,
+                                      HttpServletRequest request) {
+        try {
+            User user = getLoggedInUser(request);
+
+            Movie newMovie = new Movie();
+            newMovie.setGenre(movie.getGenre());
+            newMovie.setTitle(movie.getTitle());
+            newMovie.setStatus(movie.getStatus());
+            newMovie.setUser(user);
+
+            Movie savedMovie = movieService.addMovie(newMovie);
+
+            return ResponseEntity.ok(savedMovie);
+
+        } catch (Exception e) {
+            return ResponseEntity.status(401).body("Unauthorized");
+        }
+    }
+
+    // ✅ UPDATE movie (ownership check added)
     @PutMapping("/{id}")
-    public ResponseEntity<String> updateMovie(@PathVariable int id,
-                                              @RequestBody Movie movie){
-        Movie newMovie = movieService.getById(id);
-        newMovie.setGenre(movie.getGenre());
-        newMovie.setTitle(movie.getTitle());
-        newMovie.setStatus(movie.getStatus());
+    public ResponseEntity<?> updateMovie(@PathVariable int id,
+                                         @RequestBody Movie movie,
+                                         HttpServletRequest request) {
+        try {
+            User user = getLoggedInUser(request);
 
-        movieService.addMovie(newMovie);
-        return ResponseEntity.ok("Updated");
+            Movie existingMovie = movieService.getById(id);
+
+            // 🔥 VERY IMPORTANT: check owner
+            if (existingMovie.getUser().getId() != user.getId()) {
+                return ResponseEntity.status(403).body("Forbidden");
+            }
+
+            existingMovie.setGenre(movie.getGenre());
+            existingMovie.setTitle(movie.getTitle());
+            existingMovie.setStatus(movie.getStatus());
+
+            movieService.addMovie(existingMovie);
+
+            return ResponseEntity.ok("Updated");
+
+        } catch (Exception e) {
+            return ResponseEntity.status(401).body("Unauthorized");
+        }
     }
+
+    // ✅ DELETE movie (ownership check added)
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteMovie(@PathVariable int id){
-        Movie movie = movieService.getById(id);
-        movieService.delete(id);
-        return ResponseEntity.ok("Deleted " + movie.getTitle());
+    public ResponseEntity<?> deleteMovie(@PathVariable int id,
+                                         HttpServletRequest request) {
+        try {
+            User user = getLoggedInUser(request);
+
+            Movie movie = movieService.getById(id);
+
+            // 🔥 VERY IMPORTANT
+            if (movie.getUser().getId() != user.getId()) {
+                return ResponseEntity.status(403).body("Forbidden");
+            }
+
+            movieService.delete(id);
+
+            return ResponseEntity.ok("Deleted " + movie.getTitle());
+
+        } catch (Exception e) {
+            return ResponseEntity.status(401).body("Unauthorized");
+        }
     }
 }

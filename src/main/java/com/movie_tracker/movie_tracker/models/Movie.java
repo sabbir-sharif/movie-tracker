@@ -1,35 +1,31 @@
 package com.movie_tracker.movie_tracker.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 @Entity
 public class Movie {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
+
     private String title;
     private String genre;
+
     @ManyToOne
     @JoinColumn(name = "user_id")
+    @JsonIgnore // prevents infinite loop
     private User user;
 
     private String status = "TO_WATCH";
 
-    public Movie() {
-    }
+    public Movie() {}
 
     public Movie(String status, String genre, String title, User user) {
         this.status = status != null ? status : "TO_WATCH";
         this.genre = genre;
         this.title = title;
-        this.user = user;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
         this.user = user;
     }
 
@@ -55,6 +51,14 @@ public class Movie {
 
     public void setGenre(String genre) {
         this.genre = genre;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 
     public String getStatus() {
