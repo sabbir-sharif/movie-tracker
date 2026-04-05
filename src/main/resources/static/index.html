@@ -2,41 +2,168 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Wizard Auth Portal</title>
-  <link href="https://fonts.googleapis.com/css2?family=Almendra&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/auth.css">
+  <title>Movie Tracker</title>
+  <style>
+    body {
+      font-family: Arial;
+      background: #f4f4f4;
+      margin: 0;
+      padding: 20px;
+    }
+    .container {
+      max-width: 900px;
+      margin: auto;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+    }
+    h2 { text-align: center; }
+    input, select, button {
+      padding: 10px;
+      margin: 5px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 10px;
+      text-align: center;
+    }
+    button {
+      cursor: pointer;
+    }
+  </style>
 </head>
 <body>
+<div class="container">
 
-<div class="auth-container">
+  <h2>Movie Tracker</h2>
 
-  <!-- 🧙 LOGIN SIDE -->
-  <div class="auth-panel login-panel">
-    <h2>🔮 Login</h2>
-
-    <form id="loginForm">
-      <input type="email" placeholder="Owl Mail (Email)" id="loginEmail" required>
-      <input type="password" placeholder="Secret Spell (Password)" id="loginPassword" required>
-
-      <button type="submit">Enter Hogwarts</button>
-    </form>
+  <!-- AUTH -->
+  <div>
+    <input type="text" id="name" placeholder="Name">
+    <input type="email" id="email" placeholder="Email">
+    <input type="password" id="password" placeholder="Password">
+    <button onclick="signup()">Signup</button>
+    <button onclick="login()">Login</button>
+    <button onclick="logout()">Logout</button>
   </div>
 
-  <!-- 🪄 SIGNUP SIDE -->
-  <div class="auth-panel signup-panel">
-    <h2>🪶 Signup</h2>
-
-    <form id="signupForm">
-      <input type="text" placeholder="Wizard Name" id="signupName" required>
-      <input type="email" placeholder="Owl Mail (Email)" id="signupEmail" required>
-      <input type="password" placeholder="Create Spell (Password)" id="signupPassword" required>
-
-      <button type="submit">Join the Order</button>
-    </form>
+  <!-- ADD MOVIE -->
+  <div>
+    <input type="text" id="title" placeholder="Movie Title">
+    <input type="text" id="genre" placeholder="Genre">
+    <select id="status">
+      <option value="TO_WATCH">TO_WATCH</option>
+      <option value="WATCHED">WATCHED</option>
+    </select>
+    <button onclick="addMovie()">Add Movie</button>
   </div>
+
+  <!-- TABLE -->
+  <table>
+    <thead>
+    <tr>
+      <th>Title</th>
+      <th>Genre</th>
+      <th>Status</th>
+      <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody id="movieTable"></tbody>
+  </table>
 
 </div>
 
-<script src="js/auth.js"></script>
+<script>
+  const API = "http://localhost:8080";
+
+  async function signup() {
+    const res = await fetch(API + "/auth/signup", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        name: name.value,
+        email: email.value,
+        password: password.value
+      })
+    });
+    alert(await res.text());
+  }
+
+  async function login() {
+    const res = await fetch(API + "/auth/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({
+        email: email.value,
+        password: password.value
+      })
+    });
+    alert(await res.text());
+    loadMovies();
+  }
+
+  async function logout() {
+    await fetch(API + "/auth/logout", {
+      method: "POST",
+      credentials: "include"
+    });
+    alert("Logged out");
+  }
+
+  async function addMovie() {
+    const res = await fetch(API + "/movies", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({
+        title: title.value,
+        genre: genre.value,
+        status: status.value
+      })
+    });
+    await res.text();
+    loadMovies();
+  }
+
+  async function loadMovies() {
+    const res = await fetch(API + "/movies", {
+      credentials: "include"
+    });
+
+    if (res.status !== 200) return;
+
+    const data = await res.json();
+    const table = document.getElementById("movieTable");
+    table.innerHTML = "";
+
+    data.content.forEach(m => {
+      table.innerHTML += `
+        <tr>
+          <td>${m.title}</td>
+          <td>${m.genre}</td>
+          <td>${m.status}</td>
+          <td>
+            <button onclick="deleteMovie(${m.id})">Delete</button>
+          </td>
+        </tr>
+      `;
+    });
+  }
+
+  async function deleteMovie(id) {
+    await fetch(API + "/movies/" + id, {
+      method: "DELETE",
+      credentials: "include"
+    });
+    loadMovies();
+  }
+</script>
+
 </body>
 </html>
