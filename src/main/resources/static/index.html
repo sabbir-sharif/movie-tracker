@@ -1,169 +1,333 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Movie Tracker</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CineLog — Sign In</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
   <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0c0b0f;
+      --surface: #15141a;
+      --card: #1c1b23;
+      --border: rgba(255,255,255,0.07);
+      --accent: #e8c87d;
+      --accent-dim: rgba(232,200,125,0.12);
+      --text: #f0ece4;
+      --muted: #7a7580;
+      --danger: #e07070;
+    }
+
     body {
-      font-family: Arial;
-      background: #f4f4f4;
-      margin: 0;
-      padding: 20px;
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
     }
-    .container {
-      max-width: 900px;
-      margin: auto;
-      background: white;
-      padding: 20px;
-      border-radius: 10px;
+
+    /* Cinematic background */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 60% 50% at 20% 50%, rgba(232,200,125,0.05) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 60% at 80% 30%, rgba(120,80,180,0.06) 0%, transparent 70%);
+      pointer-events: none;
     }
-    h2 { text-align: center; }
-    input, select, button {
-      padding: 10px;
-      margin: 5px;
+
+    /* Film strip decoration */
+    .film-strip {
+      position: fixed;
+      top: 0; bottom: 0;
+      width: 48px;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      overflow: hidden;
+      opacity: 0.08;
     }
-    table {
+    .film-strip.left { left: 0; }
+    .film-strip.right { right: 0; }
+    .film-hole {
+      width: 28px;
+      height: 20px;
+      border: 2px solid var(--accent);
+      border-radius: 3px;
+      margin: 8px auto;
+      flex-shrink: 0;
+    }
+
+    .auth-wrapper {
       width: 100%;
-      border-collapse: collapse;
-      margin-top: 20px;
+      max-width: 420px;
+      padding: 2rem 1rem;
+      position: relative;
+      z-index: 1;
+      animation: fadeUp 0.6s ease both;
     }
-    th, td {
-      border: 1px solid #ddd;
-      padding: 10px;
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .logo {
       text-align: center;
+      margin-bottom: 2.5rem;
     }
-    button {
+    .logo-mark {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.2rem;
+      letter-spacing: -0.5px;
+      color: var(--text);
+    }
+    .logo-mark span { color: var(--accent); font-style: italic; }
+    .logo-sub {
+      font-size: 0.75rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 2rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(232,200,125,0.4), transparent);
+    }
+
+    .tabs {
+      display: flex;
+      background: var(--surface);
+      border-radius: 8px;
+      padding: 4px;
+      margin-bottom: 1.75rem;
+      gap: 4px;
+    }
+    .tab {
+      flex: 1;
+      padding: 8px;
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.875rem;
+      font-weight: 500;
+      border-radius: 6px;
       cursor: pointer;
+      transition: all 0.2s;
     }
+    .tab.active {
+      background: var(--card);
+      color: var(--accent);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.4);
+    }
+
+    .form-group {
+      margin-bottom: 1rem;
+    }
+    label {
+      display: block;
+      font-size: 0.78rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+    input {
+      width: 100%;
+      padding: 11px 14px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    input:focus {
+      border-color: rgba(232,200,125,0.4);
+      box-shadow: 0 0 0 3px rgba(232,200,125,0.07);
+    }
+    input::placeholder { color: var(--muted); opacity: 0.6; }
+
+    .btn-primary {
+      width: 100%;
+      padding: 12px;
+      margin-top: 0.5rem;
+      background: var(--accent);
+      color: #0c0b0f;
+      border: none;
+      border-radius: 8px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.15s;
+      letter-spacing: 0.02em;
+    }
+    .btn-primary:hover { opacity: 0.9; }
+    .btn-primary:active { transform: scale(0.98); }
+    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .msg {
+      margin-top: 0.75rem;
+      font-size: 0.85rem;
+      text-align: center;
+      min-height: 1.2em;
+      color: var(--danger);
+    }
+    .msg.success { color: #7ec87e; }
+
+    .panel { display: none; }
+    .panel.active { display: block; }
   </style>
 </head>
 <body>
-<div class="container">
 
-  <h2>Movie Tracker</h2>
+<div class="film-strip left">
+  <div class="film-hole"></div><div class="film-hole"></div><div class="film-hole"></div>
+  <div class="film-hole"></div><div class="film-hole"></div><div class="film-hole"></div>
+  <div class="film-hole"></div><div class="film-hole"></div><div class="film-hole"></div>
+  <div class="film-hole"></div><div class="film-hole"></div><div class="film-hole"></div>
+</div>
+<div class="film-strip right">
+  <div class="film-hole"></div><div class="film-hole"></div><div class="film-hole"></div>
+  <div class="film-hole"></div><div class="film-hole"></div><div class="film-hole"></div>
+  <div class="film-hole"></div><div class="film-hole"></div><div class="film-hole"></div>
+  <div class="film-hole"></div><div class="film-hole"></div><div class="film-hole"></div>
+</div>
 
-  <!-- AUTH -->
-  <div>
-    <input type="text" id="name" placeholder="Name">
-    <input type="email" id="email" placeholder="Email">
-    <input type="password" id="password" placeholder="Password">
-    <button onclick="signup()">Signup</button>
-    <button onclick="login()">Login</button>
-    <button onclick="logout()">Logout</button>
+<div class="auth-wrapper">
+  <div class="logo">
+    <div class="logo-mark">Cine<span>Log</span></div>
+    <div class="logo-sub">Your personal movie tracker</div>
   </div>
 
-  <!-- ADD MOVIE -->
-  <div>
-    <input type="text" id="title" placeholder="Movie Title">
-    <input type="text" id="genre" placeholder="Genre">
-    <select id="status">
-      <option value="TO_WATCH">TO_WATCH</option>
-      <option value="WATCHED">WATCHED</option>
-    </select>
-    <button onclick="addMovie()">Add Movie</button>
+  <div class="card">
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('login')">Sign In</button>
+      <button class="tab" onclick="switchTab('signup')">Create Account</button>
+    </div>
+
+    <!-- LOGIN -->
+    <div class="panel active" id="panel-login">
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" id="login-email" placeholder="you@example.com" />
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="login-password" placeholder="••••••••" />
+      </div>
+      <button class="btn-primary" onclick="doLogin()">Sign In</button>
+      <div class="msg" id="login-msg"></div>
+    </div>
+
+    <!-- SIGNUP -->
+    <div class="panel" id="panel-signup">
+      <div class="form-group">
+        <label>Full Name</label>
+        <input type="text" id="signup-name" placeholder="Jane Doe" />
+      </div>
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" id="signup-email" placeholder="you@example.com" />
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="signup-password" placeholder="••••••••" />
+      </div>
+      <button class="btn-primary" onclick="doSignup()">Create Account</button>
+      <div class="msg" id="signup-msg"></div>
+    </div>
   </div>
-
-  <!-- TABLE -->
-  <table>
-    <thead>
-    <tr>
-      <th>Title</th>
-      <th>Genre</th>
-      <th>Status</th>
-      <th>Actions</th>
-    </tr>
-    </thead>
-    <tbody id="movieTable"></tbody>
-  </table>
-
 </div>
 
 <script>
-  const API = "http://localhost:8080";
+  const BASE = 'http://localhost:8080';
 
-  async function signup() {
-    const res = await fetch(API + "/auth/signup", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        name: name.value,
-        email: email.value,
-        password: password.value
-      })
+  function switchTab(tab) {
+    document.querySelectorAll('.tab').forEach((t, i) => {
+      t.classList.toggle('active', (i === 0 && tab === 'login') || (i === 1 && tab === 'signup'));
     });
-    alert(await res.text());
+    document.getElementById('panel-login').classList.toggle('active', tab === 'login');
+    document.getElementById('panel-signup').classList.toggle('active', tab === 'signup');
   }
 
-  async function login() {
-    const res = await fetch(API + "/auth/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-      body: JSON.stringify({
-        email: email.value,
-        password: password.value
-      })
-    });
-    alert(await res.text());
-    loadMovies();
+  async function doLogin() {
+    const email = document.getElementById('login-email').value.trim();
+    const password = document.getElementById('login-password').value;
+    const msg = document.getElementById('login-msg');
+    msg.textContent = '';
+    if (!email || !password) { msg.textContent = 'Please fill in all fields.'; return; }
+    try {
+      const res = await fetch(`${BASE}/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ email, password })
+      });
+      const text = await res.text();
+      if (res.ok) { window.location.href = 'movies.html'; }
+      else { msg.textContent = text || 'Login failed.'; }
+    } catch { msg.textContent = 'Could not reach server.'; }
   }
 
-  async function logout() {
-    await fetch(API + "/auth/logout", {
-      method: "POST",
-      credentials: "include"
-    });
-    alert("Logged out");
+  async function doSignup() {
+    const name = document.getElementById('signup-name').value.trim();
+    const email = document.getElementById('signup-email').value.trim();
+    const password = document.getElementById('signup-password').value;
+    const msg = document.getElementById('signup-msg');
+    msg.textContent = '';
+    if (!name || !email || !password) { msg.textContent = 'Please fill in all fields.'; return; }
+    try {
+      const res = await fetch(`${BASE}/auth/signup`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ name, email, password })
+      });
+      const text = await res.text();
+      if (res.ok) { msg.className = 'msg success'; msg.textContent = 'Account created! Signing you in…'; await doLoginAfterSignup(email, password); }
+      else { msg.textContent = text || 'Signup failed.'; }
+    } catch { msg.textContent = 'Could not reach server.'; }
   }
 
-  async function addMovie() {
-    const res = await fetch(API + "/movies", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-      body: JSON.stringify({
-        title: title.value,
-        genre: genre.value,
-        status: status.value
-      })
-    });
-    await res.text();
-    loadMovies();
+  async function doLoginAfterSignup(email, password) {
+    try {
+      const res = await fetch(`${BASE}/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ email, password })
+      });
+      if (res.ok) window.location.href = 'movies.html';
+    } catch {}
   }
 
-  async function loadMovies() {
-    const res = await fetch(API + "/movies", {
-      credentials: "include"
-    });
-
-    if (res.status !== 200) return;
-
-    const data = await res.json();
-    const table = document.getElementById("movieTable");
-    table.innerHTML = "";
-
-    data.content.forEach(m => {
-      table.innerHTML += `
-        <tr>
-          <td>${m.title}</td>
-          <td>${m.genre}</td>
-          <td>${m.status}</td>
-          <td>
-            <button onclick="deleteMovie(${m.id})">Delete</button>
-          </td>
-        </tr>
-      `;
-    });
-  }
-
-  async function deleteMovie(id) {
-    await fetch(API + "/movies/" + id, {
-      method: "DELETE",
-      credentials: "include"
-    });
-    loadMovies();
-  }
+  // Redirect if already logged in
+  fetch(`${BASE}/auth/me`, { credentials: 'include' }).then(r => {
+    if (r.ok) window.location.href = 'movies.html';
+  }).catch(() => {});
 </script>
-
 </body>
 </html>

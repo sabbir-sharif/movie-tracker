@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CineLog — My Movies</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0c0b0f;
+      --surface: #15141a;
+      --card: #1c1b23;
+      --border: rgba(255,255,255,0.07);
+      --accent: #e8c87d;
+      --accent-dim: rgba(232,200,125,0.10);
+      --text: #f0ece4;
+      --muted: #7a7580;
+      --danger: #e07070;
+      --success: #7ec87e;
+      --watching: #7ab4e8;
+      --watched: #a07ee8;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(ellipse 70% 40% at 50% 0%, rgba(232,200,125,0.04) 0%, transparent 60%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── HEADER ── */
+    header {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(12,11,15,0.85);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 2rem;
+      height: 60px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .logo-text {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.3rem;
+    }
+    .logo-text span { color: var(--accent); font-style: italic; }
+    .header-right { display: flex; align-items: center; gap: 1rem; }
+    .user-chip {
+      font-size: 0.8rem;
+      color: var(--muted);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 4px 12px;
+    }
+    .btn-logout {
+      font-size: 0.8rem;
+      color: var(--muted);
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 5px 12px;
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      transition: color 0.2s, border-color 0.2s;
+    }
+    .btn-logout:hover { color: var(--danger); border-color: var(--danger); }
+
+    /* ── MAIN ── */
+    main {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem 4rem;
+      position: relative; z-index: 1;
+    }
+
+    /* ── STATS BAR ── */
+    .stats-bar {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 2rem;
+      animation: fadeUp 0.4s ease both;
+    }
+    .stat-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1rem 1.25rem;
+      text-align: center;
+    }
+    .stat-num {
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--accent);
+      line-height: 1;
+    }
+    .stat-label {
+      font-size: 0.75rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    /* ── TOOLBAR ── */
+    .toolbar {
+      display: flex; gap: 12px; align-items: center;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+      animation: fadeUp 0.4s 0.05s ease both;
+    }
+    .search-wrap {
+      flex: 1; min-width: 180px;
+      position: relative;
+    }
+    .search-wrap input {
+      width: 100%;
+      padding: 9px 14px 9px 36px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .search-wrap input:focus { border-color: rgba(232,200,125,0.35); }
+    .search-icon {
+      position: absolute; left: 11px; top: 50%; transform: translateY(-50%);
+      color: var(--muted); font-size: 14px; pointer-events: none;
+    }
+    select {
+      padding: 9px 12px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.875rem;
+      outline: none;
+      cursor: pointer;
+    }
+    .btn-add {
+      padding: 9px 18px;
+      background: var(--accent);
+      color: #0c0b0f;
+      border: none;
+      border-radius: 8px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: opacity 0.2s, transform 0.15s;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .btn-add:hover { opacity: 0.9; }
+    .btn-add:active { transform: scale(0.97); }
+
+    /* ── MOVIE GRID ── */
+    .movie-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+      gap: 16px;
+      animation: fadeUp 0.4s 0.1s ease both;
+    }
+
+    .movie-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 1.25rem;
+      position: relative;
+      transition: border-color 0.2s, transform 0.2s;
+      overflow: hidden;
+    }
+    .movie-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    .movie-card[data-status="TO_WATCH"]::before  { background: var(--accent); }
+    .movie-card[data-status="WATCHING"]::before  { background: var(--watching); }
+    .movie-card[data-status="WATCHED"]::before   { background: var(--watched); }
+
+    .movie-card:hover { border-color: rgba(255,255,255,0.15); transform: translateY(-2px); }
+    .movie-card:hover::before { opacity: 1; }
+
+    .card-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; margin-bottom: 10px; }
+    .movie-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.05rem;
+      line-height: 1.3;
+      flex: 1;
+    }
+    .card-actions { display: flex; gap: 6px; opacity: 0; transition: opacity 0.2s; flex-shrink: 0; }
+    .movie-card:hover .card-actions { opacity: 1; }
+    .btn-icon {
+      width: 30px; height: 30px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      border-radius: 6px;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px;
+      transition: background 0.15s, border-color 0.15s;
+    }
+    .btn-icon:hover { background: var(--card); border-color: rgba(255,255,255,0.18); }
+    .btn-icon.del:hover { border-color: var(--danger); }
+
+    .movie-genre {
+      font-size: 0.75rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 12px;
+    }
+
+    .status-badge {
+      display: inline-flex; align-items: center; gap: 5px;
+      font-size: 0.72rem;
+      font-weight: 500;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      padding: 3px 10px;
+      border-radius: 20px;
+    }
+    .status-badge.TO_WATCH  { background: rgba(232,200,125,0.12); color: var(--accent); }
+    .status-badge.WATCHING  { background: rgba(122,180,232,0.12); color: var(--watching); }
+    .status-badge.WATCHED   { background: rgba(160,126,232,0.12); color: var(--watched); }
+    .status-dot {
+      width: 5px; height: 5px; border-radius: 50%;
+      background: currentColor;
+    }
+
+    /* ── EMPTY STATE ── */
+    .empty-state {
+      grid-column: 1/-1;
+      text-align: center;
+      padding: 4rem 2rem;
+      color: var(--muted);
+    }
+    .empty-state .empty-icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      opacity: 0.4;
+    }
+    .empty-state p { font-size: 0.95rem; line-height: 1.6; }
+
+    /* ── PAGINATION ── */
+    .pagination {
+      display: flex; align-items: center; justify-content: center;
+      gap: 8px; margin-top: 2rem;
+    }
+    .page-btn {
+      padding: 6px 14px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.85rem;
+      border-radius: 7px;
+      cursor: pointer;
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .page-btn:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+    .page-btn:disabled { opacity: 0.3; cursor: default; }
+    .page-info { font-size: 0.85rem; color: var(--muted); padding: 0 8px; }
+
+    /* ── MODAL ── */
+    .overlay {
+      display: none;
+      position: fixed; inset: 0; z-index: 200;
+      background: rgba(0,0,0,0.65);
+      backdrop-filter: blur(4px);
+      align-items: center; justify-content: center;
+    }
+    .overlay.open { display: flex; }
+    .modal {
+      background: var(--card);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 16px;
+      padding: 2rem;
+      width: 100%; max-width: 380px;
+      position: relative;
+      animation: modalIn 0.25s ease;
+    }
+    @keyframes modalIn {
+      from { opacity: 0; transform: scale(0.95) translateY(10px); }
+      to   { opacity: 1; transform: scale(1) translateY(0); }
+    }
+    .modal-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.2rem;
+      margin-bottom: 1.5rem;
+    }
+    .modal-title span { color: var(--accent); font-style: italic; }
+    .form-group { margin-bottom: 1rem; }
+    .form-group label {
+      display: block;
+      font-size: 0.75rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+    .form-group input, .form-group select {
+      width: 100%;
+      padding: 10px 12px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .form-group input:focus { border-color: rgba(232,200,125,0.35); }
+    .modal-actions { display: flex; gap: 10px; margin-top: 1.5rem; }
+    .btn-primary {
+      flex: 1; padding: 10px;
+      background: var(--accent); color: #0c0b0f;
+      border: none; border-radius: 8px;
+      font-family: 'DM Sans', sans-serif; font-size: 0.9rem; font-weight: 500;
+      cursor: pointer; transition: opacity 0.2s;
+    }
+    .btn-primary:hover { opacity: 0.88; }
+    .btn-cancel {
+      flex: 1; padding: 10px;
+      background: transparent; color: var(--muted);
+      border: 1px solid var(--border); border-radius: 8px;
+      font-family: 'DM Sans', sans-serif; font-size: 0.9rem;
+      cursor: pointer; transition: border-color 0.2s, color 0.2s;
+    }
+    .btn-cancel:hover { border-color: rgba(255,255,255,0.2); color: var(--text); }
+    .modal-msg { margin-top: 0.5rem; font-size: 0.82rem; color: var(--danger); text-align: center; min-height: 1em; }
+
+    /* ── DELETE CONFIRM ── */
+    .del-overlay {
+      display: none;
+      position: fixed; inset: 0; z-index: 300;
+      background: rgba(0,0,0,0.7);
+      backdrop-filter: blur(4px);
+      align-items: center; justify-content: center;
+    }
+    .del-overlay.open { display: flex; }
+    .del-modal {
+      background: var(--card);
+      border: 1px solid rgba(224,112,112,0.25);
+      border-radius: 16px;
+      padding: 1.75rem;
+      width: 100%; max-width: 340px;
+      text-align: center;
+      animation: modalIn 0.2s ease;
+    }
+    .del-icon { font-size: 2rem; margin-bottom: 0.75rem; }
+    .del-modal h3 { font-family: 'Playfair Display', serif; font-size: 1.1rem; margin-bottom: 0.5rem; }
+    .del-modal p { font-size: 0.85rem; color: var(--muted); margin-bottom: 1.25rem; line-height: 1.5; }
+    .btn-danger {
+      padding: 10px 24px;
+      background: var(--danger); color: #fff;
+      border: none; border-radius: 8px;
+      font-family: 'DM Sans', sans-serif; font-size: 0.9rem; font-weight: 500;
+      cursor: pointer; margin-right: 8px;
+      transition: opacity 0.2s;
+    }
+    .btn-danger:hover { opacity: 0.85; }
+
+    /* ── TOAST ── */
+    .toast {
+      position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%) translateY(80px);
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 8px; padding: 10px 20px;
+      font-size: 0.875rem; color: var(--text);
+      z-index: 999;
+      transition: transform 0.3s ease, opacity 0.3s ease;
+      opacity: 0; white-space: nowrap;
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+    .toast.error { border-color: rgba(224,112,112,0.3); }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="logo-text">Cine<span>Log</span></div>
+  <div class="header-right">
+    <div class="user-chip" id="user-chip">Loading…</div>
+    <button class="btn-logout" onclick="doLogout()">Sign Out</button>
+  </div>
+</header>
+
+<!-- MAIN -->
+<main>
+  <!-- Stats -->
+  <div class="stats-bar">
+    <div class="stat-card">
+      <div class="stat-num" id="stat-total">—</div>
+      <div class="stat-label">Total</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" id="stat-watching" style="color:var(--watching)">—</div>
+      <div class="stat-label">Watching</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" id="stat-watched" style="color:var(--watched)">—</div>
+      <div class="stat-label">Watched</div>
+    </div>
+  </div>
+
+  <!-- Toolbar -->
+  <div class="toolbar">
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="search-input" placeholder="Search movies…" oninput="renderGrid()" />
+    </div>
+    <select id="filter-status" onchange="renderGrid()">
+      <option value="">All statuses</option>
+      <option value="TO_WATCH">To Watch</option>
+      <option value="WATCHING">Watching</option>
+      <option value="WATCHED">Watched</option>
+    </select>
+    <select id="filter-genre" onchange="renderGrid()">
+      <option value="">All genres</option>
+    </select>
+    <button class="btn-add" onclick="openAdd()">＋ Add Movie</button>
+  </div>
+
+  <!-- Grid -->
+  <div class="movie-grid" id="movie-grid">
+    <div class="empty-state">
+      <div class="empty-icon">🎬</div>
+      <p>Loading your movies…</p>
+    </div>
+  </div>
+
+  <!-- Pagination -->
+  <div class="pagination" id="pagination"></div>
+</main>
+
+<!-- ADD / EDIT MODAL -->
+<div class="overlay" id="movie-overlay">
+  <div class="modal">
+    <div class="modal-title" id="modal-title">Add a <span>movie</span></div>
+    <div class="form-group">
+      <label>Title</label>
+      <input type="text" id="m-title" placeholder="e.g. Inception" />
+    </div>
+    <div class="form-group">
+      <label>Genre</label>
+      <input type="text" id="m-genre" placeholder="e.g. Sci-Fi, Drama, Horror…" />
+    </div>
+    <div class="form-group">
+      <label>Status</label>
+      <select id="m-status">
+        <option value="TO_WATCH">To Watch</option>
+        <option value="WATCHING">Watching</option>
+        <option value="WATCHED">Watched</option>
+      </select>
+    </div>
+    <div class="modal-msg" id="modal-msg"></div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+      <button class="btn-primary" id="modal-submit-btn" onclick="submitMovie()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- DELETE CONFIRM -->
+<div class="del-overlay" id="del-overlay">
+  <div class="del-modal">
+    <div class="del-icon">🗑️</div>
+    <h3>Remove movie?</h3>
+    <p id="del-msg">This will permanently remove <strong id="del-title"></strong> from your list.</p>
+    <button class="btn-danger" onclick="confirmDelete()">Remove</button>
+    <button class="btn-cancel" style="padding:10px 20px;" onclick="closeDel()">Cancel</button>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+  const BASE = 'http://localhost:8080';
+  let allMovies = [];
+  let currentPage = 0;
+  let totalPages = 1;
+  const PAGE_SIZE = 9;
+
+  let editingId = null;
+  let deletingId = null;
+
+  // ─── AUTH GUARD ───
+  async function init() {
+    const res = await fetch(`${BASE}/auth/me`, { credentials: 'include' });
+    if (!res.ok) { window.location.href = 'index.html'; return; }
+    loadMovies();
+    loadUserInfo();
+  }
+
+  async function loadUserInfo() {
+    // We only get userId from /me; show it simply
+    const res = await fetch(`${BASE}/auth/me`, { credentials: 'include' });
+    if (res.ok) {
+      const id = await res.json();
+      document.getElementById('user-chip').textContent = `User #${id}`;
+    }
+  }
+
+  // ─── MOVIES ───
+  async function loadMovies() {
+    try {
+      const res = await fetch(`${BASE}/movies?page=${currentPage}&size=${PAGE_SIZE}`, { credentials: 'include' });
+      if (!res.ok) { window.location.href = 'index.html'; return; }
+      const data = await res.json();
+      allMovies = data.content;
+      totalPages = data.totalPages;
+      updateStats(data);
+      updateGenreFilter();
+      renderGrid();
+      renderPagination(data);
+    } catch {
+      toast('Could not load movies.', true);
+    }
+  }
+
+  function updateStats(data) {
+    // We track across current page; for accurate counts fetch all or use server totals
+    const all = data.content;
+    document.getElementById('stat-total').textContent = data.totalElements ?? all.length;
+    // For watching/watched we filter local page (backend doesn't send totals per status)
+    // Use totalElements for total, partial for the others
+    const watching = all.filter(m => m.status === 'WATCHING').length;
+    const watched  = all.filter(m => m.status === 'WATCHED').length;
+    document.getElementById('stat-watching').textContent = watching;
+    document.getElementById('stat-watched').textContent = watched;
+  }
+
+  function updateGenreFilter() {
+    const genres = [...new Set(allMovies.map(m => m.genre).filter(Boolean))].sort();
+    const sel = document.getElementById('filter-genre');
+    const current = sel.value;
+    sel.innerHTML = '<option value="">All genres</option>';
+    genres.forEach(g => {
+      const o = document.createElement('option');
+      o.value = g; o.textContent = g;
+      if (g === current) o.selected = true;
+      sel.appendChild(o);
+    });
+  }
+
+  function renderGrid() {
+    const search = document.getElementById('search-input').value.toLowerCase();
+    const status = document.getElementById('filter-status').value;
+    const genre  = document.getElementById('filter-genre').value;
+
+    let filtered = allMovies.filter(m => {
+      const matchSearch = !search || m.title.toLowerCase().includes(search) || (m.genre||'').toLowerCase().includes(search);
+      const matchStatus = !status || m.status === status;
+      const matchGenre  = !genre  || m.genre === genre;
+      return matchSearch && matchStatus && matchGenre;
+    });
+
+    const grid = document.getElementById('movie-grid');
+    if (!filtered.length) {
+      grid.innerHTML = `<div class="empty-state"><div class="empty-icon">🎬</div><p>No movies found.<br>Add your first one!</p></div>`;
+      return;
+    }
+
+    grid.innerHTML = filtered.map(m => `
+      <div class="movie-card" data-status="${m.status}">
+        <div class="card-top">
+          <div class="movie-title">${escHtml(m.title)}</div>
+          <div class="card-actions">
+            <button class="btn-icon" title="Edit" onclick="openEdit(${m.id})">✏️</button>
+            <button class="btn-icon del" title="Delete" onclick="openDel(${m.id}, '${escHtml(m.title)}')">🗑️</button>
+          </div>
+        </div>
+        <div class="movie-genre">${escHtml(m.genre || 'No genre')}</div>
+        <div class="status-badge ${m.status}">
+          <span class="status-dot"></span>
+          ${statusLabel(m.status)}
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function renderPagination(data) {
+    const pg = document.getElementById('pagination');
+    if (data.totalPages <= 1) { pg.innerHTML = ''; return; }
+    pg.innerHTML = `
+      <button class="page-btn" onclick="goPage(${currentPage-1})" ${currentPage===0?'disabled':''}>← Prev</button>
+      <span class="page-info">Page ${currentPage+1} of ${data.totalPages}</span>
+      <button class="page-btn" onclick="goPage(${currentPage+1})" ${currentPage>=data.totalPages-1?'disabled':''}>Next →</button>
+    `;
+  }
+
+  function goPage(p) {
+    currentPage = p;
+    loadMovies();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  // ─── ADD / EDIT ───
+  function openAdd() {
+    editingId = null;
+    document.getElementById('modal-title').innerHTML = 'Add a <span>movie</span>';
+    document.getElementById('m-title').value = '';
+    document.getElementById('m-genre').value = '';
+    document.getElementById('m-status').value = 'TO_WATCH';
+    document.getElementById('modal-msg').textContent = '';
+    document.getElementById('modal-submit-btn').textContent = 'Add Movie';
+    document.getElementById('movie-overlay').classList.add('open');
+  }
+
+  function openEdit(id) {
+    const m = allMovies.find(x => x.id === id);
+    if (!m) return;
+    editingId = id;
+    document.getElementById('modal-title').innerHTML = 'Edit <span>movie</span>';
+    document.getElementById('m-title').value = m.title;
+    document.getElementById('m-genre').value = m.genre || '';
+    document.getElementById('m-status').value = m.status;
+    document.getElementById('modal-msg').textContent = '';
+    document.getElementById('modal-submit-btn').textContent = 'Save Changes';
+    document.getElementById('movie-overlay').classList.add('open');
+  }
+
+  function closeModal() {
+    document.getElementById('movie-overlay').classList.remove('open');
+  }
+
+  async function submitMovie() {
+    const title  = document.getElementById('m-title').value.trim();
+    const genre  = document.getElementById('m-genre').value.trim();
+    const status = document.getElementById('m-status').value;
+    const msg    = document.getElementById('modal-msg');
+    msg.textContent = '';
+
+    if (!title) { msg.textContent = 'Title is required.'; return; }
+
+    const payload = { title, genre, status };
+    try {
+      let res;
+      if (editingId === null) {
+        res = await fetch(`${BASE}/movies`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify(payload)
+        });
+      } else {
+        res = await fetch(`${BASE}/movies/${editingId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify(payload)
+        });
+      }
+      if (res.ok) {
+        closeModal();
+        toast(editingId === null ? 'Movie added!' : 'Movie updated!');
+        loadMovies();
+      } else {
+        const t = await res.text();
+        msg.textContent = t || 'Something went wrong.';
+      }
+    } catch { msg.textContent = 'Network error.'; }
+  }
+
+  // ─── DELETE ───
+  function openDel(id, title) {
+    deletingId = id;
+    document.getElementById('del-title').textContent = title;
+    document.getElementById('del-overlay').classList.add('open');
+  }
+  function closeDel() {
+    document.getElementById('del-overlay').classList.remove('open');
+    deletingId = null;
+  }
+  async function confirmDelete() {
+    if (!deletingId) return;
+    try {
+      const res = await fetch(`${BASE}/movies/${deletingId}`, {
+        method: 'DELETE', credentials: 'include'
+      });
+      if (res.ok) {
+        closeDel(); toast('Movie removed.');
+        loadMovies();
+      } else { toast('Could not delete.', true); closeDel(); }
+    } catch { toast('Network error.', true); closeDel(); }
+  }
+
+  // ─── LOGOUT ───
+  async function doLogout() {
+    await fetch(`${BASE}/auth/logout`, { method: 'POST', credentials: 'include' });
+    window.location.href = 'index.html';
+  }
+
+  // ─── TOAST ───
+  function toast(msg, error = false) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = 'toast' + (error ? ' error' : '');
+    requestAnimationFrame(() => t.classList.add('show'));
+    setTimeout(() => t.classList.remove('show'), 2800);
+  }
+
+  // ─── UTILS ───
+  function escHtml(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+  function statusLabel(s) {
+    return { TO_WATCH: 'To Watch', WATCHING: 'Watching', WATCHED: 'Watched' }[s] || s;
+  }
+
+  // Close modal on overlay click
+  document.getElementById('movie-overlay').addEventListener('click', e => {
+    if (e.target === e.currentTarget) closeModal();
+  });
+  document.getElementById('del-overlay').addEventListener('click', e => {
+    if (e.target === e.currentTarget) closeDel();
+  });
+
+  init();
+</script>
+</body>
+</html>
