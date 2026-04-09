@@ -521,13 +521,22 @@
   }
 
   async function loadUserInfo() {
-    // We only get userId from /me; show it simply
+  try {
     const res = await fetch(`${BASE}/auth/me`, { credentials: 'include' });
-    if (res.ok) {
-      const id = await res.json();
-      document.getElementById('user-chip').textContent = `User #${id}`;
-    }
+
+    if (!res.ok) return;
+
+    const user = await res.json();
+
+    // Show name (fallback to email or ID)
+    const displayName = user.name || user.email || `User #${user.id}`;
+
+    document.getElementById('user-chip').textContent = displayName;
+
+  } catch {
+    document.getElementById('user-chip').textContent = 'User';
   }
+}
 
   // ─── MOVIES ───
   async function loadMovies() {

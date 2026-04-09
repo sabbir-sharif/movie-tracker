@@ -58,14 +58,20 @@ public class AuthController {
     }
 
     @GetMapping("/me")
-    public ResponseEntity<?> me(HttpSession session) {
-        Object userId = session.getAttribute("userId");
+    public ResponseEntity<?> getCurrentUser(HttpSession session) {
+        Integer userId = (Integer) session.getAttribute("userId");
 
         if (userId == null) {
-            return ResponseEntity.status(401).body("Not logged in");
+            return ResponseEntity.status(401).build();
         }
 
-        return ResponseEntity.ok(userId);
+        User user = userRepository.findById(userId).orElse(null);
+
+        if (user == null) {
+            return ResponseEntity.status(404).build();
+        }
+
+        return ResponseEntity.ok(user); // return full user
     }
 
     @PostMapping("/logout")
