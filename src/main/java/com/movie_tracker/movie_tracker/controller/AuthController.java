@@ -27,7 +27,7 @@ public class AuthController {
             return ResponseEntity.badRequest().body("Email already exists");
         }
 
-        // Plain text password (as you requested)
+        // Plain text password is used
         userRepository.save(user);
 
         return ResponseEntity.ok("User registered successfully");
@@ -44,9 +44,8 @@ public class AuthController {
             return ResponseEntity.status(401).body("Invalid email");
         }
 
-        User user = userOptional.get();
+        User user = userOptional.get();//get the user inside optional container
 
-        // Plain text comparison
         if (!user.getPassword().equals(requestUser.getPassword())) {
             return ResponseEntity.status(401).body("Invalid password");
         }

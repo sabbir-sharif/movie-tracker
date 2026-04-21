@@ -28,7 +28,6 @@ public class MovieController {
         this.movieService = movieService;
     }
 
-    // ✅ Helper method (VERY IMPORTANT)
     private User getLoggedInUser(HttpServletRequest request) {
         HttpSession session = request.getSession(false);
 
@@ -42,7 +41,7 @@ public class MovieController {
                 .orElseThrow(() -> new RuntimeException("User not found"));
     }
 
-    // ✅ GET all movies (SAFE)
+
     @GetMapping
     public ResponseEntity<?> getAllMovie(HttpServletRequest request,
                                          Pageable pageable) {
@@ -55,7 +54,6 @@ public class MovieController {
         }
     }
 
-    // ✅ ADD movie
     @PostMapping
     public ResponseEntity<?> addMovie(@RequestBody Movie movie,
                                       HttpServletRequest request) {
@@ -77,7 +75,6 @@ public class MovieController {
         }
     }
 
-    // ✅ UPDATE movie (ownership check added)
     @PutMapping("/{id}")
     public ResponseEntity<?> updateMovie(@PathVariable int id,
                                          @RequestBody Movie movie,
@@ -87,7 +84,7 @@ public class MovieController {
 
             Movie existingMovie = movieService.getById(id);
 
-            // 🔥 VERY IMPORTANT: check owner
+            //check owner
             if (existingMovie.getUser().getId() != user.getId()) {
                 return ResponseEntity.status(403).body("Forbidden");
             }
@@ -105,7 +102,6 @@ public class MovieController {
         }
     }
 
-    // ✅ DELETE movie (ownership check added)
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteMovie(@PathVariable int id,
                                          HttpServletRequest request) {
@@ -114,7 +110,6 @@ public class MovieController {
 
             Movie movie = movieService.getById(id);
 
-            // 🔥 VERY IMPORTANT
             if (movie.getUser().getId() != user.getId()) {
                 return ResponseEntity.status(403).body("Forbidden");
             }
