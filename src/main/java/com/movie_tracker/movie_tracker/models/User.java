@@ -2,6 +2,10 @@ package com.movie_tracker.movie_tracker.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
 import java.util.List;
 
@@ -14,10 +18,12 @@ public class User {
 
     private String name;
 
+    @Email
+    @NotBlank
     @Column(unique = true)
     private String email;
 
-   // @JsonIgnore // VERY IMPORTANT (security)
+    @Size(min = 6)
     private String password;
 
     @OneToMany(mappedBy = "user")
