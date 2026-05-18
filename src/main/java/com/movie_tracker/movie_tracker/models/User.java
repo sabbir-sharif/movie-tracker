@@ -18,24 +18,25 @@ public class User {
 
     private String name;
 
-    @Email
-    @NotBlank
-    @Column(unique = true)
+
     private String email;
 
-    @Size(min = 6)
+
     private String password;
 
     @OneToMany(mappedBy = "user")
     @JsonIgnore // prevents infinite loop
     private List<Movie> movies;
 
+    private boolean enabled;
+
     public User() {}
 
-    public User(String name, String email, String password) {
+    public User(String name, String email, String password, boolean enabled) {
         this.name = name;
         this.email = email;
         this.password = password;
+        this.enabled = enabled;
     }
 
     public String getPassword() {
@@ -78,5 +79,11 @@ public class User {
         this.email = email;
     }
 
+    public boolean isEnabled() {
+        return enabled;
+    }
 
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
 }

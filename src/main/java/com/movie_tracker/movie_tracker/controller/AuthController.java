@@ -1,9 +1,11 @@
 package com.movie_tracker.movie_tracker.controller;
 
+import com.movie_tracker.movie_tracker.dto.SignUpRequestDto;
 import com.movie_tracker.movie_tracker.models.User;
 import com.movie_tracker.movie_tracker.repository.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,19 +21,25 @@ public class AuthController {
     private UserRepository userRepository;
 
     @PostMapping("/signup")
-    public ResponseEntity<?> signup(@RequestBody User user) {
-
-        Optional<User> existingUser = userRepository.findByEmail(user.getEmail());
-
-        if (existingUser.isPresent()) {
-            return ResponseEntity.badRequest().body("Email already exists");
-        }
-
-        // Plain text password is used
-        userRepository.save(user);
+    public ResponseEntity<?> signup_new(@Valid @RequestBody SignUpRequestDto request){
 
         return ResponseEntity.ok("User registered successfully");
     }
+
+//    @PostMapping("/signup")
+//    public ResponseEntity<?> signup(@RequestBody User user) {
+//
+//        Optional<User> existingUser = userRepository.findByEmail(user.getEmail());
+//
+//        if (existingUser.isPresent()) {
+//            return ResponseEntity.badRequest().body("Email already exists");
+//        }
+//
+//        // Plain text password is used
+//        userRepository.save(user);
+//
+//        return ResponseEntity.ok("User registered successfully");
+//    }
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody User requestUser,
