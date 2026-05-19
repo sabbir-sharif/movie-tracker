@@ -10,22 +10,23 @@ public class VerificationToken {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
+
     private String token;
 
     @OneToOne
     @JoinColumn(name = "user_id")
     private User user;
 
-    private LocalDateTime expirayDate;
+    private LocalDateTime expiryDate;
 
     public VerificationToken() {
     }
 
-    public VerificationToken(int id, String token, User user, LocalDateTime expirayDate) {
+    public VerificationToken(int id, String token, User user, LocalDateTime expiryDate) {
         this.id = id;
         this.token = token;
         this.user = user;
-        this.expirayDate = expirayDate;
+        this.expiryDate = expiryDate;
     }
 
     public int getId() {
@@ -52,11 +53,11 @@ public class VerificationToken {
         this.user = user;
     }
 
-    public LocalDateTime getExpirayDate() {
-        return expirayDate;
+    public LocalDateTime getExpiryDate() {
+        return expiryDate;
     }
 
-    public void setExpirayDate(LocalDateTime expirayDate) {
-        this.expirayDate = expirayDate;
+    public void setExpiryDate(LocalDateTime expiryDate) {
+        this.expiryDate = expiryDate;
     }
 }

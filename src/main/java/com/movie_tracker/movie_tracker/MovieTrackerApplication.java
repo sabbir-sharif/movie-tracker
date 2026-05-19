@@ -16,6 +16,8 @@ public class MovieTrackerApplication {
 		System.setProperty("DB_USERNAME", dotenv.get("DB_USERNAME"));
 		System.setProperty("DB_PASSWORD", dotenv.get("DB_PASSWORD"));
 		System.setProperty("spring.profiles.active", dotenv.get("SPRING_PROFILES_ACTIVE"));
+		System.setProperty("MAIL_USERNAME", dotenv.get("MAIL_USERNAME"));
+		System.setProperty("MAIL_PASSWORD", dotenv.get("MAIL_PASSWORD"));
 
 		SpringApplication.run(MovieTrackerApplication.class, args);
 	}
