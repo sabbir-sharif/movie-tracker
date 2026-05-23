@@ -239,6 +239,21 @@
         <input type="password" id="login-password" placeholder="••••••••" />
       </div>
       <button class="btn-primary" onclick="doLogin()">Sign In</button>
+
+      <div style="text-align:right; margin-top:10px;">
+        <a href="forgot-password.html"
+           style="
+        color: var(--accent);
+        text-decoration: none;
+        font-size: 0.85rem;
+        transition: opacity 0.2s;
+     "
+           onmouseover="this.style.opacity='0.7'"
+           onmouseout="this.style.opacity='1'">
+          Forgot Password?
+        </a>
+      </div>
+
       <div class="msg" id="login-msg"></div>
     </div>
 
@@ -292,25 +307,98 @@
     } catch { msg.textContent = 'Could not reach server.'; }
   }
 
-  async function doSignup() {
-    const name = document.getElementById('signup-name').value.trim();
-    const email = document.getElementById('signup-email').value.trim();
-    const password = document.getElementById('signup-password').value;
-    const msg = document.getElementById('signup-msg');
-    msg.textContent = '';
-    if (!name || !email || !password) { msg.textContent = 'Please fill in all fields.'; return; }
-    try {
-      const res = await fetch(`${BASE}/auth/signup`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ name, email, password })
-      });
-      const text = await res.text();
-      if (res.ok) { msg.className = 'msg success'; msg.textContent = 'Account created! Signing you in…'; await doLoginAfterSignup(email, password); }
-      else { msg.textContent = text || 'Signup failed.'; }
-    } catch { msg.textContent = 'Could not reach server.'; }
+// Replace your existing doSignup() function with this version
+
+async function doSignup() {
+  const name = document.getElementById('signup-name').value.trim();
+  const email = document.getElementById('signup-email').value.trim();
+  const password = document.getElementById('signup-password').value;
+  const msg = document.getElementById('signup-msg');
+
+  // Reset message
+  msg.className = 'msg';
+  msg.textContent = '';
+
+  // Basic client-side validation
+  if (!name || !email || !password) {
+    msg.textContent = 'Please fill in all fields.';
+    return;
   }
+
+  try {
+    const res = await fetch(`${BASE}/auth/signup`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ name, email, password })
+    });
+
+    const text = await res.text();
+
+    if (res.ok) {
+      // Success message
+      msg.className = 'msg success';
+      msg.textContent = 'Verification code sent to your email.';
+
+      // Popup message
+      alert(
+        '📧 Account created successfully!\n\n' +
+        'A verification code has been sent to your email.\n' +
+        'Please verify your email before logging in.'
+      );
+
+      // Optional: switch to login tab automatically
+      switchTab('login');
+
+      // Optional: pre-fill login email
+      document.getElementById('login-email').value = email;
+
+      // Optional: clear signup form
+      document.getElementById('signup-name').value = '';
+      document.getElementById('signup-email').value = '';
+      document.getElementById('signup-password').value = '';
+    } else {
+      // Show backend validation or business error
+      msg.className = 'msg';
+      msg.textContent = text || 'Signup failed.';
+
+      // If backend says email verification is required
+      if (
+        text.toLowerCase().includes('verify') ||
+        text.toLowerCase().includes('verification')
+      ) {
+        alert(
+          '📧 Email Verification Required\n\n' +
+          text
+        );
+      }
+    }
+  } catch (error) {
+    msg.className = 'msg';
+    msg.textContent = 'Could not reach server.';
+    alert('❌ Could not connect to the server.');
+  }
+}
+
+<!--  async function doSignup() {-->
+<!--    const name = document.getElementById('signup-name').value.trim();-->
+<!--    const email = document.getElementById('signup-email').value.trim();-->
+<!--    const password = document.getElementById('signup-password').value;-->
+<!--    const msg = document.getElementById('signup-msg');-->
+<!--    msg.textContent = '';-->
+<!--    if (!name || !email || !password) { msg.textContent = 'Please fill in all fields.'; return; }-->
+<!--    try {-->
+<!--      const res = await fetch(`${BASE}/auth/signup`, {-->
+<!--        method: 'POST',-->
+<!--        headers: { 'Content-Type': 'application/json' },-->
+<!--        credentials: 'include',-->
+<!--        body: JSON.stringify({ name, email, password })-->
+<!--      });-->
+<!--      const text = await res.text();-->
+<!--      if (res.ok) { msg.className = 'msg success'; msg.textContent = 'Account created! Signing you in…'; await doLoginAfterSignup(email, password); }-->
+<!--      else { msg.textContent = text || 'Signup failed.'; }-->
+<!--    } catch { msg.textContent = 'Could not reach server.'; }-->
+<!--  }-->
 
   async function doLoginAfterSignup(email, password) {
     try {

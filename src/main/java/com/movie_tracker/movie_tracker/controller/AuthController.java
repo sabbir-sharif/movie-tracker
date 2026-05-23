@@ -1,5 +1,6 @@
 package com.movie_tracker.movie_tracker.controller;
 
+import com.movie_tracker.movie_tracker.dto.ResetPassworddto;
 import com.movie_tracker.movie_tracker.dto.SignUpRequestDto;
 import com.movie_tracker.movie_tracker.models.User;
 import com.movie_tracker.movie_tracker.models.VerificationToken;
@@ -133,6 +134,21 @@ public class AuthController {
         }
 
         return ResponseEntity.ok(user); // return full user
+    }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<?> forgotPassword(@Valid @RequestBody ResetPassworddto resetPassworddto){
+        Optional<User> emailPaisi = userRepository.findByEmail(resetPassworddto.getEmail());
+
+        if(emailPaisi.isEmpty()){
+            return ResponseEntity.status(401).body("Invalid Email");
+        }
+
+        User user = emailPaisi.get(); // User warpper -> User type
+        String token = UUID.randomUUID().toString();
+        emailService.sendVerificationMail(user.getEmail(), token);
+
+        return ResponseEntity.ok("Email has been sent.");
     }
 
     @PostMapping("/logout")
