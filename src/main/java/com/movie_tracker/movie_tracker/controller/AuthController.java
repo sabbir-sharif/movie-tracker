@@ -1,12 +1,15 @@
 package com.movie_tracker.movie_tracker.controller;
 
+import com.movie_tracker.movie_tracker.dto.ResetPasswordRequest;
 import com.movie_tracker.movie_tracker.dto.ResetPassworddto;
 import com.movie_tracker.movie_tracker.dto.SignUpRequestDto;
+import com.movie_tracker.movie_tracker.models.ResetPassword;
 import com.movie_tracker.movie_tracker.models.User;
 import com.movie_tracker.movie_tracker.models.VerificationToken;
 import com.movie_tracker.movie_tracker.repository.UserRepository;
 import com.movie_tracker.movie_tracker.repository.VerificationTokenRepository;
 import com.movie_tracker.movie_tracker.service.EmailService;
+import com.movie_tracker.movie_tracker.service.ResetPasswordEmailService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
@@ -29,6 +32,8 @@ public class AuthController {
     private VerificationTokenRepository tokenRepository;
     @Autowired
     private EmailService emailService;
+    @Autowired
+    private ResetPasswordEmailService resetPasswordEmailService;
 
     @GetMapping("/verify")
     public ResponseEntity<String> verify(@RequestParam String token) {
@@ -71,7 +76,9 @@ public class AuthController {
 
         tokenRepository.save(verificationToken);
 
-        emailService.sendVerificationMail(user.getEmail(), token);
+        String subject = "Verification your CineLog account.";
+        String text = "Click the link to verify your account:";
+        emailService.sendVerificationMail(user.getEmail(), token, subject, text);
 
         return ResponseEntity.ok("User registered successfully");
     }
@@ -146,9 +153,42 @@ public class AuthController {
 
         User user = emailPaisi.get(); // User warpper -> User type
         String token = UUID.randomUUID().toString();
-        emailService.sendVerificationMail(user.getEmail(), token);
+
+        VerificationToken verificationToken = new VerificationToken();
+        verificationToken.setToken(token);
+        verificationToken.setUser(user);
+        verificationToken.setExpiryDate(LocalDateTime.now().plusHours(24));
+
+        tokenRepository.save(verificationToken);
+        String subject = "Verification for forget password";
+        String text = "Click the link to set up your new password:";
+        resetPasswordEmailService.sendVerificationMail(user.getEmail(), token, subject, text);
 
         return ResponseEntity.ok("Email has been sent.");
+    }
+
+    @PatchMapping("/reset-password")
+    public ResponseEntity<?> updatePassword(
+            @RequestBody ResetPasswordRequest request) {
+
+        VerificationToken resetToken =
+                tokenRepository.findByToken(request.getToken())
+                        .orElseThrow(() -> new RuntimeException("Invalid token"));
+
+        if(resetToken.getExpiryDate().isBefore(LocalDateTime.now())){
+            return ResponseEntity.badRequest()
+                    .body("Token expired");
+        }
+
+        User user = resetToken.getUser();
+
+        user.setPassword(request.getPassword());
+
+        userRepository.save(user);
+
+        tokenRepository.delete(resetToken);
+
+        return ResponseEntity.ok("Password reset successfully");
     }
 
     @PostMapping("/logout")
