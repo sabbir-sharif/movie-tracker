@@ -68,40 +68,15 @@ sequenceDiagram
 	end
 ```
 
-## 🧩 Sequence Diagram: All Features
+## 🔐 Sequence Diagram: Login + Logout
 
 ```mermaid
 sequenceDiagram
 	actor Client
 	participant AuthController
-	participant MovieController
-	participant MovieService
 	participant UserRepository
-	participant MovieRepository
-	participant VerificationTokenRepository
-	participant EmailService
-	participant ResetPasswordEmailService
-	participant MailServer
 	participant SessionStore
 
-	%% Sign up + verify
-	Client->>AuthController: POST /auth/signup (name,email,password)
-	AuthController->>UserRepository: save(User enabled=false)
-	AuthController->>VerificationTokenRepository: save(token, user, expiry)
-	AuthController->>EmailService: sendVerificationMail(to, token, subject, text)
-	EmailService->>MailServer: send email with /auth/verify?token=...
-
-	Client->>AuthController: GET /auth/verify?token=...
-	AuthController->>VerificationTokenRepository: findByToken(token)
-	alt token expired
-		AuthController-->>Client: 400 "Token expired"
-	else token valid
-		AuthController->>UserRepository: save(User enabled=true)
-		AuthController->>VerificationTokenRepository: delete(token)
-		AuthController-->>Client: 200 "Email verified successfully"
-	end
-
-	%% Login + logout
 	Client->>AuthController: POST /auth/login (email,password)
 	AuthController->>UserRepository: findByEmail(email)
 	alt invalid email or password
@@ -116,8 +91,19 @@ sequenceDiagram
 	Client->>AuthController: POST /auth/logout
 	AuthController->>SessionStore: invalidate
 	AuthController-->>Client: 200 "Logged out"
+```
 
-	%% Forgot + reset password
+## 🔁 Sequence Diagram: Forgot + Reset Password
+
+```mermaid
+sequenceDiagram
+	actor Client
+	participant AuthController
+	participant UserRepository
+	participant VerificationTokenRepository
+	participant ResetPasswordEmailService
+	participant MailServer
+
 	Client->>AuthController: POST /auth/forgot-password (email)
 	AuthController->>UserRepository: findByEmail(email)
 	alt email not found
@@ -138,8 +124,19 @@ sequenceDiagram
 		AuthController->>VerificationTokenRepository: delete(token)
 		AuthController-->>Client: 200 "Password reset successfully"
 	end
+```
 
-	%% Movies CRUD (requires session)
+## 🎥 Sequence Diagram: Movies CRUD
+
+```mermaid
+sequenceDiagram
+	actor Client
+	participant MovieController
+	participant MovieService
+	participant UserRepository
+	participant MovieRepository
+	participant SessionStore
+
 	Client->>MovieController: GET /movies
 	MovieController->>SessionStore: get userId
 	MovieController->>UserRepository: findById(userId)
