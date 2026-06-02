@@ -16,6 +16,7 @@ CineLog is a full-stack movie tracking web application that allows users to mana
 - 🎨 Modern responsive UI  
 - 📧 Email verification for registration
 - 🕒 Forget password functionality with email reset link
+- 🐳 Dockerized for easy deployment
 
 ---
 
