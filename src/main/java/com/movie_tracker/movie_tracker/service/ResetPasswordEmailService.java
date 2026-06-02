@@ -17,7 +17,7 @@ public class ResetPasswordEmailService {
 
     public void sendVerificationMail(String to, String token, String subject, String text) {
 
-        String link = "http://localhost:8080/reset-password.html?token=" + token;
+        String link = "https://movie-tracker-2.onrender.com/reset-password.html?token=" + token;
 
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(to);

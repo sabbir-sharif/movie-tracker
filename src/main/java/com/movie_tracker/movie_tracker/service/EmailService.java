@@ -13,7 +13,7 @@ public class EmailService {
 
     public void sendVerificationMail(String to, String token, String subject, String text){
 
-        String link = "http://localhost:8080/auth/verify?token=" + token;
+        String link = "https://movie-tracker-2.onrender.com/auth/verify?token=" + token;
 
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(to);
