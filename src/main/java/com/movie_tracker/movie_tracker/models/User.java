@@ -25,7 +25,7 @@ public class User {
 
     private String password;
 
-    @OneToMany(mappedBy = "users")
+    @OneToMany(mappedBy = "user")
     @JsonIgnore // prevents infinite loop
     private List<Movie> movies;
 
