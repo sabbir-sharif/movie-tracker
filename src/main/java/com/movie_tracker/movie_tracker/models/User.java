@@ -10,6 +10,7 @@ import jakarta.validation.constraints.Size;
 import java.util.List;
 
 @Entity
+@Table(name = "users")
 public class User {
 
     @Id
@@ -24,7 +25,7 @@ public class User {
 
     private String password;
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "users")
     @JsonIgnore // prevents infinite loop
     private List<Movie> movies;
 
